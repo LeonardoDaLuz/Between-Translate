@@ -4,31 +4,34 @@ window.onkeydown = (e) => {
     }
 }
 var ps = null;
-var els = null;
+var pels = null;
+var hs = null;
+var hels = null;
 
 function traduzir() {
     console.log("traduzir");
     console.log(ps);
     if (ps === null) {
         createStyles();
-        createElements();
-        traduzirElementos(els);
+        createPElements();
+        createHElements();
+        traduzirElementos(pels);
     } else {
         console.log("kghj");
         [...ps].forEach(e=> {
             e.classList.toggle("origin");
         })
 
-        els.forEach(e=> {
+        pels.forEach(e=> {
             e.classList.toggle('display-none'); 
         })
     }
 
 }
 
-function createElements() {
+function createPElements() {
     ps = document.querySelectorAll("p");
-    els = [...ps].map(p => {
+    pels = [...ps].map(p => {
         let el = document.createElement("span");
 
         el.classList.add("trad");
@@ -39,6 +42,18 @@ function createElements() {
     })
 }
 
+function createHElements() {
+    hs = document.querySelectorAll("h1, h2");
+    hels = [...hs].map(h => {
+        let el = document.createElement("span");
+
+        el.classList.add("trad");
+        h.classList.add("origin");
+        el.innerHTML = h.innerHTML.replaceAll('"', "'").replaceAll(/\n/g, "32594");
+        h.prepend(el);
+        return el;
+    })
+}
 function createStyles() {
     let style = document.createElement("style");
     document.body.prepend(style);

@@ -8,12 +8,14 @@ chrome.storage.sync.get("color", ({ color }) => {
 // When the button is clicked, inject setPageBackgroundColor into current page
 changeColor.addEventListener("click", async () => {
     let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-
+/*
     chrome.scripting.executeScript({
         target: { tabId: tab.id },
         function: traduzir,
     });
+    */
 });
+
 
 // The body of this function will be executed as a content script inside the
 // current page
@@ -112,3 +114,13 @@ function traduzir() {
     }
 
 }
+
+
+/*
+bug encontrado ao traduzir essa pg: https://www.w3schools.com/cssref/css_pxtoemconversion.asp
+traduzir os h1
+
+
+
+
+*/

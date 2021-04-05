@@ -36,7 +36,7 @@ function traduzir() {
             display: block;    
         }
         .origin {
-            line-height: 2em;  
+            line-height: 2em!important;  
             position: relative;
         }
         .trad * {
@@ -106,7 +106,8 @@ function traduzir() {
 
             })
             .catch(error => {
-
+                alert("it was not possible to do the translation");
+                throw new Error("it was not possible to do the translation");
             });
     }
 

@@ -4,9 +4,11 @@ window.onkeydown = (e) => {
     }
 }
 var ps = null;
-var pels = null;
+var tradPs = null;
 var hs = null;
-var hels = null;
+var tradHs = null;
+var allElements = [];
+var allTradElements = [];
 
 function traduzir() {
     console.log("traduzir");
@@ -14,46 +16,65 @@ function traduzir() {
     if (ps === null) {
         createStyles();
         createPElements();
+       // traduzirElementos(tradPs);
         createHElements();
-        traduzirElementos(pels);
+        traduzirElementos(allTradElements);
     } else {
-        console.log("kghj");
-        [...ps].forEach(e=> {
-            e.classList.toggle("origin");
-        })
-
-        pels.forEach(e=> {
-            e.classList.toggle('display-none'); 
-        })
+            toggle();
     }
 
 }
 
+function toggle() {
+    [...ps].forEach(e=> {
+        e.classList.toggle("origin");
+    })
+
+    tradPs.forEach(e=> {
+        e.classList.toggle('display-none'); 
+    })
+}
 function createPElements() {
     ps = document.querySelectorAll("p");
-    pels = [...ps].map(p => {
-        let el = document.createElement("span");
-
-        el.classList.add("trad");
+    tradPs = [...ps].map(p => {
+        let tradP = document.createElement("span");
+        tradP.classList.add("trad");
         p.classList.add("origin");
-        el.innerHTML = p.innerHTML.replaceAll('"', "'").replaceAll(/\n/g, "32594");
-        p.prepend(el);
-        return el;
+        tradP.innerHTML = escapa(p.textContent);
+        p.prepend(tradP);
+        return tradP;
     })
+
+    allElements = allElements.concat([...ps]);
+    allTradElements = allTradElements.concat(tradPs);
 }
 
 function createHElements() {
     hs = document.querySelectorAll("h1, h2");
-    hels = [...hs].map(h => {
-        let el = document.createElement("span");
+    tradHs = [...hs].map(h => {
+        let tradH = document.createElement("span");
 
-        el.classList.add("trad");
+        tradH.classList.add("trad");
         h.classList.add("origin");
-        el.innerHTML = h.innerHTML.replaceAll('"', "'").replaceAll(/\n/g, "32594");
-        h.prepend(el);
-        return el;
+        tradH.innerHTML = escapa(h.textContent);
+        h.prepend(tradH);
+        return tradH;
     })
+
+    allElements = allElements.concat([...hs]);
+    allTradElements = allTradElements.concat(tradHs);
 }
+
+function escapa(txt) {
+    return txt.replaceAll('"', "'").replaceAll(/”|“|\[|\]/gi, '').replaceAll('&', "and").replaceAll(/\n/g, "32594");
+ 
+    
+}
+
+function desescapa(txt) {
+    return txt.replaceAll("32594", /\n/g);
+}
+
 function createStyles() {
     let style = document.createElement("style");
     document.body.prepend(style);
@@ -80,37 +101,52 @@ function createStyles() {
     `;
 }
 
-function traduzirElementos(els) {
-    let elementsTexts = els.map(el => el.textContent);
-    console.log(elementsTexts);
-    let specialChar = "987456"
-    let arrTratado = JSON.stringify(elementsTexts).replaceAll('"', specialChar);
-    console.log(arrTratado.replaceAll(specialChar, '"'));
-    console.log("test parse:");
-    console.log(JSON.parse(arrTratado.replaceAll(specialChar, '"')));
+function  codificar(txt) {
+    return txt.replaceAll('["', '[').replaceAll('","', '].[').replaceAll('"]', ']');
+}
 
-    tradTxt(arrTratado, data => {
+function  decodificar(txt) {
+    return txt.replaceAll('"')
+    .replaceAll('].[', '","').replaceAll(']. [', '","').replaceAll('] [', '","').replaceAll('] . [', '","').replaceAll('][', '","') //estruturas intactas mas com espaços
+    .replaceAll('] ', '","').replaceAll(' [', '","').replaceAll(']. ', '","').replaceAll(' .[', '","') //estruturas onde o google comeu caracteres especiais
+    .replaceAll(']', '"]').replaceAll('[', '["').replaceAll('"].', '"]'); //arruma o inicio e o fim da string json
+}
+
+function traduzirElementos(elementos) {
+    let elementsTexts = elementos.map(el => el.textContent);
+    console.log(elementsTexts);
+    let specialChar = '3278378';
+    let specialCharVariation = '{ }';
+
+    console.log("nao codificado: "+JSON.stringify(elementsTexts));
+    let conteudoCodificado = codificar(JSON.stringify(elementsTexts));
+    console.log("codificado: "+conteudoCodificado);
+    console.log("decodificado: "+decodificar(conteudoCodificado));
+    console.log("test parse:");
+    console.log(JSON.parse(decodificar(conteudoCodificado)));
+
+    tradTxt(conteudoCodificado, data => {
 
         let newData = data.map(item => item[0]).join('');
 
         console.log("retorno n tratado:");
         console.log(newData);
-        console.log("retorno tratado:");
-        let retornoTratado = newData.replaceAll(specialChar, '"').replaceAll("32594", "\\n").replaceAll('"."', '","');
+        console.log("retorno decodificado:");
+        let retornoTratado = decodificar(newData);
         console.log(retornoTratado);
         console.log("retorno parse:");
         let retornoParseado = JSON.parse(retornoTratado);
         console.log(retornoParseado);
 
-        console.log(els);
-        for (i = 0; i < els.length; i++) {
+        console.log(elementos);
+        for (i = 0; i < elementos.length; i++) {
             //console.log("s: "+els[i].innerHTML.length+" t: "+retornoParseado[i].length);
             //let comp= "s: "+els[i].innerHTML.length+" t: "+retornoParseado[i].length;
-            let fontSize = (els[i].innerHTML.length / retornoParseado[i].length) * 0.95;
+            let fontSize = (elementos[i].innerHTML.length / retornoParseado[i].length) * 0.95;
             fontSize = fontSize > 1 ? 1 : fontSize;
 
-            els[i].style = " font-size: " + fontSize + "em;";
-            els[i].innerHTML = retornoParseado[i];
+            elementos[i].style = " font-size: " + fontSize + "em;";
+            elementos[i].innerHTML = desescapa(retornoParseado[i]);
 
             // els[i].innerHTML+=comp;
         }
@@ -120,12 +156,12 @@ function traduzirElementos(els) {
 function tradTxt(txt, callback) {
     fetch('https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=pt&dt=t&q=' + txt).then(response => response.json())
         .then(data => {
-
+            console.log(data);
             callback(data[0]);
 
         })
         .catch(error => {
-            alert("it was not possible to do the translation");
-            throw new Error("it was not possible to do the translation");
+            toggle();
+            console.log(error);
         });
 }

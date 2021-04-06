@@ -16,7 +16,7 @@ function traduzir() {
         createPElements();
         createHElements();
         clearEmptyElements();
-        traduzirElementos(allTranslateElements.slice(0,17));
+        traduzirAssincrono(allTranslateElements);
     } else {
         toggle();
     }
@@ -34,6 +34,14 @@ function clearEmptyElements() {
     })
     allTranslateElements = allTranslateElements.filter(x => (x.textContent !== "" && x.textContent !== " "));
     allElements = allElements.filter(x => (x.textContent !== "" && x.textContent !== " "));
+}
+
+async function traduzirAssincrono(allTranslateElements) {
+    for(let i=0; i<allTranslateElements.length; i+=10)
+    {
+        traduzirElementos(allTranslateElements.slice(i,i+10));
+        await waitForSeconds(3);
+    }
 }
 
 function toggle() {
@@ -214,4 +222,12 @@ function tradTxt(txt, elementos, callback) {
             toggle();
             console.log(error);
         });
+}
+
+function waitForSeconds(seconds) {
+    return new Promise((resolve, reject)=>{
+        setTimeout(()=>{
+            resolve();
+        }, seconds*1000);
+    })
 }

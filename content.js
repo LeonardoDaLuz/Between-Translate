@@ -219,7 +219,7 @@ function tradTxt(txt, elementos, callback) {
 
         })
         .catch(error => {
-            toggle();
+            //toggle();
             console.log(error);
         });
 }

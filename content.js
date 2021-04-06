@@ -8,45 +8,50 @@ var tradPs = null;
 var hs = null;
 var tradHs = null;
 var allElements = [];
-var allTradElements = [];
+var allTranslateElements = [];
 
 function traduzir() {
-    console.log("traduzir");
-    console.log(ps);
     if (ps === null) {
         createStyles();
         createPElements();
-       // traduzirElementos(tradPs);
         createHElements();
-        traduzirElementos(allTradElements);
+        clearEmptyElements();
+        traduzirElementos(allTranslateElements);
     } else {
-            toggle();
+        toggle();
     }
 
 }
 
+function clearEmptyElements() {
+
+    allTranslateElements = allTranslateElements.filter(x => (x.textContent !== "" && x.textContent !== " "));
+    allElements = allElements.filter(x => (x.textContent !== "" && x.textContent !== " "));
+}
+
 function toggle() {
-    [...ps].forEach(e=> {
-        e.classList.toggle("origin");
+    allElements.forEach(e => {
+        e.classList.toggle("origin-language");
     })
 
-    tradPs.forEach(e=> {
-        e.classList.toggle('display-none'); 
+    allTranslateElements.forEach(e => {
+        e.classList.toggle('display-none');
     })
 }
+
 function createPElements() {
     ps = document.querySelectorAll("p");
     tradPs = [...ps].map(p => {
         let tradP = document.createElement("span");
-        tradP.classList.add("trad");
-        p.classList.add("origin");
+        tradP.classList.add("target-language");
+        p.classList.add("origin-language");
         tradP.innerHTML = escapa(p.textContent);
         p.prepend(tradP);
         return tradP;
-    })
+    });
 
     allElements = allElements.concat([...ps]);
-    allTradElements = allTradElements.concat(tradPs);
+    allTranslateElements = allTranslateElements.concat(tradPs);
 }
 
 function createHElements() {
@@ -54,21 +59,20 @@ function createHElements() {
     tradHs = [...hs].map(h => {
         let tradH = document.createElement("span");
 
-        tradH.classList.add("trad");
-        h.classList.add("origin");
+        tradH.classList.add("target-language");
+        h.classList.add("origin-language");
         tradH.innerHTML = escapa(h.textContent);
         h.prepend(tradH);
         return tradH;
     })
 
     allElements = allElements.concat([...hs]);
-    allTradElements = allTradElements.concat(tradHs);
+    allTranslateElements = allTranslateElements.concat(tradHs);
 }
 
 function escapa(txt) {
-    return txt.replaceAll('"', "'").replaceAll(/”|“|\[|\]/gi, '').replaceAll('&', "and").replaceAll(/\n/g, "32594");
- 
-    
+    return txt.replaceAll('"', "'").replaceAll(/”|“|\[|\]/gi, '').replaceAll('&', "and").replaceAll(/\n/g, "32594").replace(/[`~!@#$%^&*()_|<>\{\}\[\]\\\/]/gi, '');
+
 }
 
 function desescapa(txt) {
@@ -80,18 +84,19 @@ function createStyles() {
     document.body.prepend(style);
     style.innerHTML =
         `
-        .trad {
+        .target-language {
             position: absolute;
             color: blue;
             top: 1em;
             font-size: 0.856em;
             display: block;    
         }
-        .origin {
+        .origin-language {
             line-height: 2em!important;  
             position: relative;
+            clear: both;
         }
-        .trad * {
+        .target-language * {
             color: blue!important;
 
         }
@@ -101,32 +106,32 @@ function createStyles() {
     `;
 }
 
-function  codificar(txt) {
+function codificar(txt) {
     return txt.replaceAll('["', '[').replaceAll('","', '].[').replaceAll('"]', ']');
 }
 
-function  decodificar(txt) {
+function decodificar(txt) {
     return txt.replaceAll('"')
-    .replaceAll('].[', '","').replaceAll(']. [', '","').replaceAll('] [', '","').replaceAll('] . [', '","').replaceAll('][', '","') //estruturas intactas mas com espaços
-    .replaceAll('] ', '","').replaceAll(' [', '","').replaceAll(']. ', '","').replaceAll(' .[', '","') //estruturas onde o google comeu caracteres especiais
-    .replaceAll(']', '"]').replaceAll('[', '["').replaceAll('"].', '"]'); //arruma o inicio e o fim da string json
+        .replaceAll('].[', '","').replaceAll(']. [', '","').replaceAll('] [', '","').replaceAll('] . [', '","').replaceAll('][', '","') //estruturas intactas mas com espaços
+        .replaceAll('] ', '","').replaceAll(' [', '","').replaceAll(']. ', '","').replaceAll(' .[', '","') //estruturas onde o google comeu caracteres especiais
+        .replaceAll(']', '"]').replaceAll('[', '["').replaceAll('"].', '"]'); //arruma o inicio e o fim da string json
 }
 
 function traduzirElementos(elementos) {
     let elementsTexts = elementos.map(el => el.textContent);
     console.log(elementsTexts);
-    let specialChar = '3278378';
-    let specialCharVariation = '{ }';
 
-    console.log("nao codificado: "+JSON.stringify(elementsTexts));
+
+    console.log("nao codificado: " + JSON.stringify(elementsTexts));
     let conteudoCodificado = codificar(JSON.stringify(elementsTexts));
-    console.log("codificado: "+conteudoCodificado);
-    console.log("decodificado: "+decodificar(conteudoCodificado));
+    console.log("codificado: " + conteudoCodificado);
+    console.log("decodificado: " + decodificar(conteudoCodificado));
     console.log("test parse:");
     console.log(JSON.parse(decodificar(conteudoCodificado)));
 
-    tradTxt(conteudoCodificado, data => {
+    tradTxt(conteudoCodificado, elementos, (data) => {
 
+        console.log(data);
         let newData = data.map(item => item[0]).join('');
 
         console.log("retorno n tratado:");
@@ -135,28 +140,31 @@ function traduzirElementos(elementos) {
         let retornoTratado = decodificar(newData);
         console.log(retornoTratado);
         console.log("retorno parse:");
-        let retornoParseado = JSON.parse(retornoTratado);
+        var retornoParseado = JSON.parse(retornoTratado);
         console.log(retornoParseado);
 
-        console.log(elementos);
+        //console.log(elementos);
+
+        //console.log("elementos vindos: "+retornoParseado.length+" disponiveis: "+elementos.length)
         for (i = 0; i < elementos.length; i++) {
-            //console.log("s: "+els[i].innerHTML.length+" t: "+retornoParseado[i].length);
-            //let comp= "s: "+els[i].innerHTML.length+" t: "+retornoParseado[i].length;
-            let fontSize = (elementos[i].innerHTML.length / retornoParseado[i].length) * 0.95;
-            fontSize = fontSize > 1 ? 1 : fontSize;
 
-            elementos[i].style = " font-size: " + fontSize + "em;";
-            elementos[i].innerHTML = desescapa(retornoParseado[i]);
+            if (retornoParseado.length > i) {
 
-            // els[i].innerHTML+=comp;
+                let fontSize = (elementos[i].innerHTML.length / retornoParseado[i].length) * 0.95;
+                fontSize = fontSize > 1 ? 1 : fontSize;
+
+                elementos[i].style = " font-size: " + fontSize + "em;";
+                elementos[i].innerHTML = desescapa(retornoParseado[i]);
+            }
+
         }
     })
 }
 
-function tradTxt(txt, callback) {
+function tradTxt(txt, elementos, callback) {
     fetch('https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=pt&dt=t&q=' + txt).then(response => response.json())
         .then(data => {
-            console.log(data);
+
             callback(data[0]);
 
         })

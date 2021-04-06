@@ -1,12 +1,9 @@
 {
     "manifest_version": 3,
-    "version": "0.0.1",
-    "name": "BetweenTradutor",
+    "version": "0.8",
+    "name": "Between Translate",
     "description": "Tradução entrelinhas",
     "author": "Leonardo da luz pinto",
-    "background": {
-        "service_worker": "background.js"
-    },
     "content_scripts": [
         {
             "matches": [

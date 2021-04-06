@@ -25,6 +25,12 @@ function traduzir() {
 
 function clearEmptyElements() {
 
+    allElements.forEach(x=> {
+        if(x.textContent===""){
+            console.log("Epa vazio ");
+            console.log(x);
+        }
+    })
     allTranslateElements = allTranslateElements.filter(x => (x.textContent !== "" && x.textContent !== " "));
     allElements = allElements.filter(x => (x.textContent !== "" && x.textContent !== " "));
 }
@@ -55,14 +61,14 @@ function createPElements() {
 }
 
 function createHElements() {
-    hs = document.querySelectorAll("h1, h2");
+    hs = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
     tradHs = [...hs].map(h => {
         let tradH = document.createElement("span");
 
         tradH.classList.add("target-language");
         h.classList.add("origin-language");
         tradH.innerHTML = escapa(h.textContent);
-        h.prepend(tradH);
+        h.append(tradH);
         return tradH;
     })
 
@@ -98,8 +104,42 @@ function createStyles() {
         }
         .target-language * {
             color: blue!important;
-
         }
+
+        h6 .target-language {
+            color: blue!important;
+            position: static;
+            line-height: 1em!important;  
+        }
+
+        h5 .target-language {
+            color: blue!important;
+            position: static;
+            line-height: 1em!important;  
+        }
+
+        h4 .target-language {
+            color: blue!important;
+            position: static;
+            line-height: 1em!important;  
+        }
+
+        h3 .target-language {
+            color: blue!important;
+            position: static;
+            line-height: 1em!important;  
+        }
+        h2 .target-language {
+            color: blue!important;
+            position: static;
+            line-height: 1em!important;  
+        }
+        h1 .target-language {
+            color: blue!important;
+            position: static;
+            line-height: 1em!important;  
+        }
+
         .display-none {
             display: none;
         }
@@ -112,6 +152,7 @@ function codificar(txt) {
 
 function decodificar(txt) {
     return txt.replaceAll('"')
+        .replaceAll('] ]',']')
         .replaceAll('].[', '","').replaceAll(']. [', '","').replaceAll('] [', '","').replaceAll('] . [', '","').replaceAll('][', '","') //estruturas intactas mas com espaços
         .replaceAll('] ', '","').replaceAll(' [', '","').replaceAll(']. ', '","').replaceAll(' .[', '","') //estruturas onde o google comeu caracteres especiais
         .replaceAll(']', '"]').replaceAll('[', '["').replaceAll('"].', '"]'); //arruma o inicio e o fim da string json
@@ -150,7 +191,7 @@ function traduzirElementos(elementos) {
 
             if (retornoParseado.length > i) {
 
-                let fontSize = (elementos[i].innerHTML.length / retornoParseado[i].length) * 0.95;
+                let fontSize = (elementos[i].innerHTML.length / retornoParseado[i].length) * 1;
                 fontSize = fontSize > 1 ? 1 : fontSize;
 
                 elementos[i].style = " font-size: " + fontSize + "em;";

@@ -16,7 +16,7 @@ function traduzir() {
         createPElements();
         createHElements();
         clearEmptyElements();
-        traduzirElementos(allTranslateElements.slice(0,15));
+        traduzirElementos(allTranslateElements.slice(0,17));
     } else {
         toggle();
     }

@@ -16,12 +16,13 @@ function traduzir() {
         createPElements();
         createHElements();
         clearEmptyElements();
-        traduzirElementos(allTranslateElements);
+        traduzirElementos(allTranslateElements.slice(0,15));
     } else {
         toggle();
     }
 
 }
+
 
 function clearEmptyElements() {
 
@@ -77,7 +78,7 @@ function createHElements() {
 }
 
 function escapa(txt) {
-    return txt.replaceAll('"', "'").replaceAll(/”|“|\[|\]/gi, '').replaceAll('&', "and").replaceAll(/\n/g, "32594").replace(/[`~!@#$%^&*()_|<>\{\}\[\]\\\/]/gi, '');
+    return txt.replaceAll('"', "'").replaceAll(/”|“|\[|\]/gi, '').replaceAll('&', "and").replaceAll(/\n/g, "32594").replaceAll(/[`~!@#$%^&*()_|<>\{\}\[\]\\\/]/gi, '').replaceAll('\t','');
 
 }
 
@@ -191,7 +192,7 @@ function traduzirElementos(elementos) {
 
             if (retornoParseado.length > i) {
 
-                let fontSize = (elementos[i].innerHTML.length / retornoParseado[i].length) * 1;
+                let fontSize = (elementos[i].innerHTML.length / retornoParseado[i].length) * 0.85;
                 fontSize = fontSize > 1 ? 1 : fontSize;
 
                 elementos[i].style = " font-size: " + fontSize + "em;";

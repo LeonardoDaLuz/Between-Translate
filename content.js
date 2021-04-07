@@ -231,3 +231,5 @@ function waitForSeconds(seconds) {
         }, seconds*1000);
     })
 }
+
+//Tendo problemas nesse site: https://en.wikipedia.org/wiki/Computer_science
